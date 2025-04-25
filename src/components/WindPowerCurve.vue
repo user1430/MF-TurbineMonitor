@@ -26,22 +26,21 @@ const generateMockData = (): DataPoint[] => {
   
   // 基础风速模式：早晚较大，中午较小
   const baseWindPattern = [
-    8, 7, 6, 5, 4, 3,  // 0-10点
-    4, 5, 6, 7, 8, 9   // 12-22点
+    8, 7, 6, 5, 4, 3, 4, 5, 6, 7, 8, 9, 8 // 增加24点数据
   ]
   
-  // 为每个时间点生成数据
-  for (let hour = 0; hour < 24; hour += 2) {
+  // 为每个时间点生成数据（0-24点，每2小时）
+  for (let hour = 0; hour <= 24; hour += 2) {
     // 获取基础风速并添加随机波动
     const baseWind = baseWindPattern[hour / 2]
     const windSpeed = Math.max(0, baseWind + (Math.random() - 0.5) * 2)
     
-    // 模拟功率计算：风速的立方与效率因子的乘积
-    const efficiency = 0.4 // 效率因子
-    const power = Math.round(Math.pow(windSpeed, 3) * efficiency * 100) // 增大系数以获得更真实的功率值
+    // 模拟功率计算
+    const efficiency = 0.4
+    const power = Math.round(Math.pow(windSpeed, 3) * efficiency * 100)
     
-    // 格式化时间
-    const timeStr = `${hour.toString().padStart(2, '0')}:00`
+    // 修改时间格式为"0点"、"2点"..."24点"
+    const timeStr = hour === 24 ? '24点' : `${hour}点`
     
     data.push({
       time: timeStr,
@@ -73,9 +72,25 @@ const generateOptions = () => {
       }
     },
     legend: {
-      data: ['功率', '风速'],
+      data: [
+        {
+          name: '功率',
+          textStyle: {
+            color: '#5470C6' // 与左侧功率坐标轴颜色一致
+          }
+        },
+        {
+          name: '风速',
+          textStyle: {
+            color: '#91CC75' // 与右侧风速坐标轴颜色一致
+          }
+        }
+      ],
       right: '10%',
-      top: '3%'
+      top: '3%',
+      textStyle: {
+        fontSize: 12
+      }
     },
     grid: {
       left: '3%',
@@ -89,7 +104,7 @@ const generateOptions = () => {
       data: mockData.map(item => item.time),
       axisLabel: {
         formatter: '{value}',
-        interval: 0
+        interval: 1
       },
       axisLine: { show: true },
       axisTick: { show: true },
