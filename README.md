@@ -65,6 +65,9 @@ npm run preview
 └── tsconfig.json      # TypeScript配置
 ```
 
+## 开发协作
+- [AI协作开发指南](./实战总结版——AI协作开发最佳实践指南.md) - 如何与AI助手高效协作开发
+
 ## 注意事项
 1. 推荐使用 Node.js 18+ 版本
 2. 开发时自动使用mock数据，生产环境需配置真实API

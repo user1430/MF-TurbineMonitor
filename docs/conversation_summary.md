@@ -6,8 +6,11 @@
 | 图表不显示 | 容器高度/层级检查 | `WindPowerCurve.vue` |
 | 坐标轴异常 | 调整grid和axisLabel配置 | `useEcharts.ts` |
 | 样式冲突 | 增加scoped和!important | `chart-styles.scss` |
+| 图例文字颜色 | 使用textStyle配置对齐坐标轴颜色 | `WindPowerCurve.vue` |
+| 时间轴显示优化 | 自定义formatter实现12小时制 | `WindPowerCurve.vue` |
 
 ## 2. 已验证方案
+
 ### 2.1 双Y轴实现
 ```javascript
 // 配置示例
@@ -20,58 +23,75 @@ yAxis: [
 ### 2.2 数据模拟
 ```javascript
 // 生成算法
-const base = Math.sin(progress) * 1800
-const windSpeed = base / 1800 * 25
+const generateMockData = () => {
+  // 基础风速模式：早晚较大，中午较小
+  const baseWindPattern = [8, 7, 6, 5, 4, 3, 4, 5, 6, 7, 8, 9, 8]
+  
+  // 每2小时生成一个数据点
+  for (let hour = 0; hour <= 24; hour += 2) {
+    const windSpeed = baseWind + random()
+    const power = Math.pow(windSpeed, 3) * efficiency
+  }
+}
 ```
 
-## 3. 典型错误处理
+## 3. 开发交互技巧
 
-### 3.1 常见报错记录
-```text
-// 容器初始化
-"useEcharts.ts:42 容器还未初始化" 
-"图表配置加载失败"
+### 3.1 渐进式优化流程
+1. 先实现基础功能，确保图表可见
+2. 优化数据结构和生成逻辑
+3. 调整视觉样式和交互体验
+4. 完善错误处理和性能优化
 
-// 样式冲突  
-"[Vue warn]: Failed to resolve component"
-"Uncaught ReferenceError: autoRotateEnabled is not defined"
+### 3.2 有效沟通模式
+1. 明确修改目标
+   - 描述当前问题
+   - 期望的效果
+   - 可能的约束条件
 
-// 数据问题
-"TypeError: chart.setOption is not a function"
-"Series data length mismatch"
-```
+2. 分步骤实施
+   - 每次只关注一个改进点
+   - 实现后立即验证效果
+   - 根据反馈及时调整
 
-### 3.2 解决方案索引
-| 错误现象 | 相关文件 | 修复方案 |
-|----------|----------|----------|
-| 容器未初始化 | useEcharts.ts | 添加null检查+重试机制 |
-| 组件解析失败 | WindPowerCurve.vue | 显式组件导入 |
-| 变量未定义 | useTurbine.ts | 添加ref声明 |
-| 图表渲染异常 | WindPowerCurve.vue | 强制resize() |
+3. 提供上下文
+   - 相关代码片段
+   - 错误信息
+   - 当前配置
 
-## 4. 待跟进事项
+### 3.3 调试技巧
+1. 使用console.log跟踪数据流
+2. 通过浏览器开发工具检查样式
+3. 观察图表容器尺寸变化
+4. 验证数据格式的正确性
+
+## 4. 常见问题解决
+
+### 4.1 样式相关
+1. 容器尺寸问题
+   - 检查容器CSS设置
+   - 确保父容器有明确的高度
+   - 使用calc()计算精确尺寸
+
+2. 响应式布局
+   - 监听窗口resize事件
+   - 使用相对单位（%, vh等）
+   - 设置合适的最小尺寸
+
+### 4.2 数据处理
+1. 数据格式化
+   - 时间格式统一
+   - 数值精度控制
+   - 空值处理策略
+
+2. 更新机制
+   - 定时刷新
+   - 条件触发
+   - 错误重试
+
+## 5. 待跟进事项
 - [ ] 移动端响应式优化
 - [ ] 真实数据接口联调
 - [ ] 性能监控埋点
-```
-
-<replace_in_file>
-<path>docs/CHART_STYLE_GUIDE.md</path>
-<diff>
-## Version Log
-</diff>
-</replace_in_file>
-
-<verify_file>
-<path>docs/conversation_summary.md</path>
-<contains>
-风电监测系统前端改造对话总结
-</contains>
-</verify_file>
-
-<verify_file>
-<path>docs/CHART_STYLE_GUIDE.md</path>
-<contains>
-## 使用指南
-</contains>
-</verify_file>
+- [ ] 图表交互体验优化
+- [ ] 主题切换支持
