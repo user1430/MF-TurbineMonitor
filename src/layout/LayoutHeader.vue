@@ -8,7 +8,7 @@
       <i class="fa-regular fa-envelope"></i>
       <div
         class="message"
-        content="【系统通知】感谢大家对我们项目的关注与支持!希望能为我们的项目点一个Star,您的支持对我们来说至关重要。"
+        content="工业场景-风电大屏3D可视化监控平台演示项目"
       ></div>
     </div>
     <div class="header-right">

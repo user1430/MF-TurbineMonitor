@@ -62,6 +62,9 @@ const CONFIG = {
 } as const
 
 export function useTurbine() {
+  const autoRotateEnabled = ref(false)
+  const isManualRotating = ref(false)
+  
   const {
     container,
     scene,
@@ -408,7 +411,60 @@ export function useTurbine() {
 
   nextTick(async () => {
     await boostrap()
+    
+    if (ocontrol.value) {
+      ocontrol.value.addEventListener('start', () => {
+        if(autoRotateEnabled.value) {
+          isManualRotating.value = true
+          stopAutoRotate()
+        }
+      })
+
+      ocontrol.value.addEventListener('end', () => {
+        if(isManualRotating.value) {
+          setTimeout(() => {
+            isManualRotating.value = false
+            startAutoRotate()
+          }, 5000)
+        }
+      })
+    }
   })
+
+  const startAutoRotate = () => {
+    if (!models.equipment) {
+      console.warn('Equipment model not loaded')
+      return
+    }
+
+    // 调试日志：打印模型结构
+    console.log('Model structure:', models.equipment)
+    
+    autoRotateEnabled.value = true
+    isManualRotating.value = false
+    
+    if (ocontrol.value) {
+      ocontrol.value.enabled = false
+    }
+
+    // 确保旋转作用于根模型
+    const rootModel = models.equipment
+    rootModel.rotation.set(0, 0, 0) // 重置旋转
+
+    const animate = () => {
+      if (!autoRotateEnabled.value || !rootModel) return
+      rootModel.rotation.y -= 0.01 // 增大旋转速度确保可见
+      requestAnimationFrame(animate)
+    }
+    animate()
+  }
+
+  const stopAutoRotate = () => {
+    autoRotateEnabled.value = false
+    if (ocontrol.value) {
+      ocontrol.value.enabled = true
+    }
+  }
 
   return {
     container,
@@ -418,6 +474,8 @@ export function useTurbine() {
     eqComposeAnimation,
     startWarning,
     stopWarning,
+    startAutoRotate,
+    stopAutoRotate,
   }
 }
 

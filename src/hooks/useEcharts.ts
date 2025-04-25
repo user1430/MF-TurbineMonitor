@@ -29,34 +29,54 @@ echarts.use([
  */
 export function useEcharts() {
   let cache = {}
-  const container = ref()
-  const chart = shallowRef()
+  const container = ref<HTMLElement>()
+  const chart = shallowRef<echarts.ECharts>()
+
+  const init = (theme = 'light'): boolean => {
+    try {
+      if (!container.value) {
+        console.warn('容器未绑定')
+        return false
+      }
+      if (chart.value) chart.value.dispose()
+      chart.value = echarts.init(container.value, theme)
+      return true
+    } catch (e) {
+      console.error('ECharts初始化失败:', e)
+      return false
+    }
+  }
 
   const resize = () => chart.value?.resize()
   const clear = () => chart.value?.clear()
-  const boostrap = (theme = 'light') => {
-    if (chart.value) chart.value?.dispose()
-    if (isElement(container.value)) {
-      chart.value = echarts.init(container.value, theme)
-    } else {
-      console.warn('容器还未初始化')
-    }
-    window.removeEventListener('resize', resize)
-    window.addEventListener('resize', resize)
-  }
-  const setOption = (option: any) => {
+  
+  const setOption = (option: echarts.ECOption) => {
     cache = option
-    if (!chart.value) boostrap()
+    if (!chart.value && !init()) return
     chart.value?.setOption(option)
   }
-  onUnmounted(() => {
-    window.removeEventListener('resize', resize)
-  })
-  onMounted(() => {
-    window.addEventListener('resize', resize)
-  })
 
-  return { container, chart, setOption, resize, clear, echarts }
+  // 生命周期管理
+  const setup = () => {
+    window.addEventListener('resize', resize)
+    return () => {
+      window.removeEventListener('resize', resize)
+      chart.value?.dispose()
+    }
+  }
+
+  onMounted(setup)
+  onUnmounted(setup)
+
+  return { 
+    container, 
+    chart, 
+    setOption, 
+    resize, 
+    clear, 
+    echarts,
+    init
+  }
 }
 
 export default useEcharts

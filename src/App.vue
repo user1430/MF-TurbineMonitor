@@ -2,7 +2,7 @@
   <Layout :loading="loading">
     <template #left>
       <WidgetPanel04 title="参数监测" />
-      <WidgetPanel02 title="历史功率" />
+      <WindPowerCurve title="风速功率曲线" />
       <WidgetPanel03 title="日发电量监测 " />
     </template>
     <template #right>
@@ -29,6 +29,7 @@ import {
   WidgetPanel05,
   WidgetPanel06,
   WidgetPanel07,
+  WindPowerCurve
 } from '@/components'
 import { provide } from 'vue'
 import { Layout } from '@/layout'
